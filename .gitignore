@@ -5,6 +5,7 @@ package-lock.json
 # 数据文件（生产环境不应上传）
 data/
 *.json
+!package.json
 !data/.gitkeep
 
 # 环境变量
