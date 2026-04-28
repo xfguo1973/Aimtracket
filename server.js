@@ -56,6 +56,7 @@ if (!fs.existsSync(GOALS_FILE)) {
 // 中间件
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.static(__dirname)); // 提供静态文件服务
 
 // ============ 请求限流中间件 ============
 
