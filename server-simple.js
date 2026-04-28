@@ -7,16 +7,19 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'aimtracker_secret_key_2026';
 
+// 数据文件路径
 const USERS_FILE = path.join(__dirname, 'data', 'users.json');
 const GOALS_FILE = path.join(__dirname, 'data', 'goals.json');
 
+// 确保数据目录存在
 if (!fs.existsSync(path.join(__dirname, 'data'))) {
     fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
 }
 
+// 初始化数据文件
 if (!fs.existsSync(USERS_FILE)) {
     fs.writeFileSync(USERS_FILE, JSON.stringify({}, null, 2));
 }
@@ -24,11 +27,12 @@ if (!fs.existsSync(GOALS_FILE)) {
     fs.writeFileSync(GOALS_FILE, JSON.stringify({}, null, 2));
 }
 
+// 中间件
 app.use(cors());
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
+// 辅助函数
 function readUsers() {
     try {
         const data = fs.readFileSync(USERS_FILE, 'utf8');
@@ -55,6 +59,7 @@ function writeGoals(goals) {
     fs.writeFileSync(GOALS_FILE, JSON.stringify(goals, null, 2));
 }
 
+// 认证中间件
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -72,6 +77,7 @@ function authenticateToken(req, res, next) {
     });
 }
 
+// 用户注册
 app.post('/api/register', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -111,6 +117,7 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
+// 用户登录
 app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -144,10 +151,12 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// 获取当前用户信息
 app.get('/api/me', authenticateToken, (req, res) => {
     res.json({ username: req.user.username });
 });
 
+// 获取目标
 app.get('/api/goals', authenticateToken, (req, res) => {
     try {
         const goals = readGoals();
@@ -159,6 +168,7 @@ app.get('/api/goals', authenticateToken, (req, res) => {
     }
 });
 
+// 创建目标
 app.post('/api/goals', authenticateToken, (req, res) => {
     try {
         const { name, targetDays, completedDays } = req.body;
@@ -184,6 +194,7 @@ app.post('/api/goals', authenticateToken, (req, res) => {
     }
 });
 
+// 更新目标
 app.put('/api/goals/:id', authenticateToken, (req, res) => {
     try {
         const goalId = parseInt(req.params.id);
@@ -217,6 +228,7 @@ app.put('/api/goals/:id', authenticateToken, (req, res) => {
     }
 });
 
+// 更新完成天数
 app.patch('/api/goals/:id/completed', authenticateToken, (req, res) => {
     try {
         const goalId = parseInt(req.params.id);
@@ -252,6 +264,7 @@ app.patch('/api/goals/:id/completed', authenticateToken, (req, res) => {
     }
 });
 
+// 删除目标
 app.delete('/api/goals/:id', authenticateToken, (req, res) => {
     try {
         const goalId = parseInt(req.params.id);
@@ -273,17 +286,13 @@ app.delete('/api/goals/:id', authenticateToken, (req, res) => {
     }
 });
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.get('/index.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`目标追踪器服务器运行在 http://localhost:${PORT}`);
-    console.log(`API地址: http://localhost:${PORT}/api`);
+// 启动服务器
+app.listen(PORT, '0.0.0.0', (err) => {
+    if (err) {
+        console.error('Failed to start server:', err);
+        process.exit(1);
+    }
+    console.log(`🚀 服务器运行在 http://localhost:${PORT}`);
 });
 
 module.exports = app;

@@ -5,7 +5,7 @@ const API_BASE_URL = (() => {
 
     // 本地开发环境
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        return 'http://localhost:3000/api';
+        return 'http://localhost:4000/api';
     }
 
     // 生产环境：API与前端同源

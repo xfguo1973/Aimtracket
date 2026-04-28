@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'aimtracker_secret_key_2026';
 
 const USERS_FILE = path.join(__dirname, 'data', 'users.json');
@@ -25,8 +25,7 @@ if (!fs.existsSync(GOALS_FILE)) {
 }
 
 app.use(cors());
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
 function readUsers() {
@@ -273,17 +272,15 @@ app.delete('/api/goals/:id', authenticateToken, (req, res) => {
     }
 });
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.get('/index.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`目标追踪器服务器运行在 http://localhost:${PORT}`);
-    console.log(`API地址: http://localhost:${PORT}/api`);
+    console.log(`🚀 服务器运行在 http://localhost:${PORT}`);
+    console.log(`📊 API 地址: http://localhost:${PORT}/api`);
+    console.log(`🔐 注册: POST /api/register`);
+    console.log(`🔐 登录: POST /api/login`);
+    console.log(`🎯 获取目标: GET /api/goals`);
+    console.log(`➕ 创建目标: POST /api/goals`);
+    console.log(`✏️ 更新目标: PUT /api/goals/:id`);
+    console.log(`🗑️ 删除目标: DELETE /api/goals/:id`);
 });
 
 module.exports = app;
