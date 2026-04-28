@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月度目标追踪器 - 2026年</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* 认证页面样式 */
+        .auth-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .auth-title {
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .form-input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .auth-btn {
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .auth-btn:active {
+            transform: translateY(0);
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .auth-switch a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        /* 主应用样式 */
+        .main-app {
+            display: none;
+        }
+
+        .user-header {
+            background: white;
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .username {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .logout-btn {
+            background: #f0f2f5;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #666;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* 顶部进度状态卡片 */
+        .progress-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-card h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .progress-item {
+            background: #f7f9fc;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .progress-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .progress-value.small {
+            font-size: 20px;
+        }
+
+        .date-range {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .date-range-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+
+        .date-range-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* 目标列表 */
+        .goals-section h2 {
+            color: white;
+            font-size: 20px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .goal-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .goal-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .goal-title {
+            flex: 1;
+        }
+
+        .goal-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .goal-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            display: inline;
+        }
+
+        .goal-percentage {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-left: 8px;
+        }
+
+        .edit-btn {
+            background: #f0f2f5;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .edit-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .goal-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stat-item {
+            background: #f7f9fc;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-value.remaining {
+            color: #f39c12;
+        }
+
+        .stat-value.completed {
+            color: #27ae60;
+        }
+
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .counter-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .counter-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .counter-btn:active {
+            transform: scale(0.95);
+        }
+
+        .counter-value {
+            font-size: 24px;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .last-update {
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+        }
+
+        /* 添加目标按钮 */
+        .add-goal-btn {
+            width: 100%;
+            padding: 16px;
+            background: white;
+            border: 2px dashed #667eea;
+            border-radius: 12px;
+            color: #667eea;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 16px;
+        }
+
+        .add-goal-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* 编辑模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .modal-btn.cancel {
+            background: #f0f2f5;
+            color: #666;
+        }
+
+        .modal-btn.save {
+            background: #667eea;
+            color: white;
+        }
+
+        .modal-btn.delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            .progress-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .goal-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-value {
+                font-size: 24px;
+            }
+
+            .user-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+
+        /* 加载指示器 */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            font-size: 18px;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录/注册页面 -->
+    <div class="auth-container" id="authPage">
+        <h1 class="auth-title">🎯 目标追踪器</h1>
+
+        <div class="error-message" id="authError"></div>
+
+        <!-- 登录表单 -->
+        <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label class="form-label">用户名</label>
+                <input type="text" class="form-input" id="loginUsername" placeholder="输入用户名" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">密码</label>
+                <input type="password" class="form-input" id="loginPassword" placeholder="输入密码" required>
+            </div>
+            <button type="submit" class="auth-btn">登录</button>
+        </form>
+
+        <!-- 注册表单 -->
+        <form class="auth-form" id="registerForm" style="display: none;" onsubmit="handleRegister(event)">
+            <div class="form-group">
+                <label class="form-label">用户名</label>
+                <input type="text" class="form-input" id="registerUsername" placeholder="输入用户名（至少3个字符）" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">密码</label>
+                <input type="password" class="form-input" id="registerPassword" placeholder="输入密码（至少6位）" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">确认密码</label>
+                <input type="password" class="form-input" id="registerConfirmPassword" placeholder="再次输入密码" required>
+            </div>
+            <button type="submit" class="auth-btn">注册</button>
+        </form>
+
+        <div class="auth-switch">
+            <span id="switchText">还没有账号？</span>
+            <a id="switchLink" onclick="toggleAuthMode()">立即注册</a>
+        </div>
+    </div>
+
+    <!-- 主应用页面 -->
+    <div class="main-app" id="mainApp">
+        <div class="container">
+            <!-- 用户信息栏 -->
+            <div class="user-header">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <span class="username" id="displayUsername"></span>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">退出登录</button>
+            </div>
+
+            <!-- 顶部进度状态卡片 -->
+            <div class="progress-card">
+                <h1>📊 2026年目标追踪</h1>
+
+                <div class="progress-grid">
+                    <div class="progress-item">
+                        <div class="progress-label">目标总天数</div>
+                        <div class="progress-value" id="totalDays">31天</div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">已过去天数</div>
+                        <div class="progress-value" id="elapsedDays">0天</div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">本月剩余天数</div>
+                        <div class="progress-value" id="remainingDays">31天</div>
+                    </div>
+                </div>
+
+                <div class="date-range">
+                    <div class="date-range-label">本月时间范围</div>
+                    <div class="date-range-value" id="dateRange">2026年5月1日 至 2026年5月31日</div>
+                </div>
+
+                <div style="margin-top: 16px; text-align: center;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 4px;">今天是</div>
+                    <div style="font-size: 18px; font-weight: bold; color: #333;" id="today"></div>
+                </div>
+            </div>
+
+            <!-- 目标列表 -->
+            <div class="goals-section">
+                <h2>🎯 我的目标</h2>
+                <div id="goalsList">
+                    <div class="loading">加载中...</div>
+                </div>
+                <button class="add-goal-btn" onclick="addNewGoal()">+ 添加新目标</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑模态框 -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-title">编辑目标</div>
+            <div class="form-group">
+                <label class="form-label">目标名称</label>
+                <input type="text" class="form-input" id="editName" placeholder="输入目标名称">
+            </div>
+            <div class="form-group">
+                <label class="form-label">目标天数</label>
+                <input type="number" class="form-input" id="editTargetDays" min="1" value="30">
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn delete" id="deleteBtn" onclick="deleteGoal()">删除</button>
+                <button class="modal-btn save" onclick="saveGoal()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 配置脚本 -->
+    <script src="config.js"></script>
+
+    <!-- API客户端（包含限流、队列、重试机制） -->
+    <script src="api-client.js"></script>
+
+    <script>
+        // 使用API客户端
+        const API_BASE_URL = APP_CONFIG.API_BASE_URL;
+        let currentUser = null;
+        let authToken = null;
+
+        // 应用数据
+        let appData = {
+            year: 2026,
+            month: 5,
+            goals: []
+        };
+
+        // 认证状态
+        let isLoginMode = true;
+
+        // 初始化
+        function init() {
+            checkAuthStatus();
+            setupEventListeners();
+        }
+
+        // 检查认证状态
+        function checkAuthStatus() {
+            authToken = localStorage.getItem('aimtracker_token');
+            currentUser = localStorage.getItem('aimtracker_user');
+
+            if (authToken && currentUser) {
+                showMainApp();
+                loadGoals();
+            } else {
+                showAuthPage();
+            }
+        }
+
+        // 显示认证页面
+        function showAuthPage() {
+            document.getElementById('authPage').style.display = 'block';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+
+        // 显示主应用
+        function showMainApp() {
+            document.getElementById('authPage').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+
+            document.getElementById('displayUsername').textContent = currentUser;
+            document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
+
+            ensureCurrentMonth();
+            renderProgress();
+        }
+
+        // 切换认证模式（登录/注册）
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const switchText = document.getElementById('switchText');
+            const switchLink = document.getElementById('switchLink');
+
+            if (isLoginMode) {
+                loginForm.style.display = 'flex';
+                registerForm.style.display = 'none';
+                switchText.textContent = '还没有账号？';
+                switchLink.textContent = '立即注册';
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'flex';
+                switchText.textContent = '已有账号？';
+                switchLink.textContent = '立即登录';
+            }
+
+            hideError();
+        }
+
+        // 处理登录
+        async function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const data = await apiClient.post('/login', { username, password });
+
+                authToken = data.token;
+                currentUser = data.username;
+                localStorage.setItem('aimtracker_token', authToken);
+                localStorage.setItem('aimtracker_user', currentUser);
+                apiClient.setToken(authToken);
+                showMainApp();
+                loadGoals();
+                hideError();
+            } catch (error) {
+                console.error('登录错误:', error);
+                showError(error.message || '登录失败');
+            }
+        }
+
+        // 处理注册
+        async function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('registerUsername').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+            if (password !== confirmPassword) {
+                showError('两次输入的密码不一致');
+                return;
+            }
+
+            try {
+                const data = await apiClient.post('/register', { username, password });
+
+                authToken = data.token;
+                currentUser = data.username;
+                localStorage.setItem('aimtracker_token', authToken);
+                localStorage.setItem('aimtracker_user', currentUser);
+                apiClient.setToken(authToken);
+                showMainApp();
+                loadGoals();
+                hideError();
+            } catch (error) {
+                console.error('注册错误:', error);
+                showError(error.message || '注册失败');
+            }
+        }
+
+        // 处理退出登录
+        function handleLogout() {
+            localStorage.removeItem('aimtracker_token');
+            localStorage.removeItem('aimtracker_user');
+            authToken = null;
+            currentUser = null;
+            showAuthPage();
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            const errorDiv = document.getElementById('authError');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // 隐藏错误信息
+        function hideError() {
+            document.getElementById('authError').style.display = 'none';
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 点击模态框外部关闭
+            document.getElementById('editModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        }
+
+        // 确保当前月份数据存在
+        function ensureCurrentMonth() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+
+            if (appData.year !== currentYear || appData.month !== currentMonth) {
+                if (confirm(`检测到当前是${currentYear}年${currentMonth}月，是否切换到当前月份？`)) {
+                    appData.year = currentYear;
+                    appData.month = currentMonth;
+                }
+            }
+        }
+
+        // 从服务器加载目标数据
+        async function loadGoals() {
+            try {
+                const goals = await apiClient.get('/goals', { useCache: true });
+                appData.goals = goals;
+                renderGoals();
+            } catch (error) {
+                console.error('加载目标错误:', error);
+                // 如果失败，使用本地数据作为备份
+                loadLocalGoals();
+            }
+        }
+
+        // 加载本地备份数据（如果有的话）
+        function loadLocalGoals() {
+            const saved = localStorage.getItem('aimtracker_backup');
+            if (saved) {
+                try {
+                    appData.goals = JSON.parse(saved);
+                } catch (error) {
+                    appData.goals = [];
+                }
+            }
+            renderGoals();
+        }
+
+        // 保存目标到服务器
+        async function syncGoal(goal) {
+            if (!authToken) return;
+
+            try {
+                await apiClient.put(`/goals/${goal.id}`, goal);
+            } catch (error) {
+                console.error('同步目标失败:', error);
+            }
+        }
+
+        // 创建目标到服务器
+        async function createGoalOnServer(goal) {
+            if (!authToken) return null;
+
+            try {
+                return await apiClient.post('/goals', {
+                    name: goal.name,
+                    targetDays: goal.targetDays,
+                    completedDays: goal.completedDays
+                });
+            } catch (error) {
+                console.error('创建目标失败:', error);
+                return null;
+            }
+        }
+
+        // 删除目标从服务器
+        async function deleteGoalOnServer(goalId) {
+            if (!authToken) return;
+
+            try {
+                await apiClient.delete(`/goals/${goalId}`);
+            } catch (error) {
+                console.error('删除目标失败:', error);
+            }
+        }
+
+        // 渲染顶部进度
+        function renderProgress() {
+            const year = appData.year;
+            const month = appData.month;
+
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const today = new Date();
+            const todayStr = formatDate(today);
+
+            let elapsedDays = 0;
+            let remainingDays = daysInMonth;
+
+            if (today.getFullYear() === year && today.getMonth() + 1 === month) {
+                elapsedDays = today.getDate();
+                remainingDays = daysInMonth - today.getDate();
+            } else if (today.getFullYear() > year || (today.getFullYear() === year && today.getMonth() + 1 > month)) {
+                elapsedDays = daysInMonth;
+                remainingDays = 0;
+            }
+
+            document.getElementById('totalDays').textContent = daysInMonth + '天';
+            document.getElementById('elapsedDays').textContent = elapsedDays + '天';
+            document.getElementById('remainingDays').textContent = remainingDays + '天';
+            document.getElementById('dateRange').textContent =
+                `${year}年${month}月1日 至 ${year}年${month}月${daysInMonth}日`;
+            document.getElementById('today').textContent = todayStr;
+        }
+
+        // 渲染目标列表
+        function renderGoals() {
+            const container = document.getElementById('goalsList');
+            container.innerHTML = '';
+
+            if (appData.goals.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无目标，点击下方按钮添加</div>';
+                return;
+            }
+
+            appData.goals.forEach((goal, index) => {
+                const percentage = Math.round((goal.completedDays / goal.targetDays) * 100);
+                const remainingDays = goal.targetDays - goal.completedDays;
+                const lastUpdate = formatDateTime(goal.lastUpdate);
+
+                const card = document.createElement('div');
+                card.className = 'goal-card';
+                card.innerHTML = `
+                    <div class="goal-header">
+                        <div class="goal-title">
+                            <span class="goal-number">${index + 1}</span>
+                            <span class="goal-name">${goal.name}</span>
+                            <span class="goal-percentage">${percentage}%</span>
+                        </div>
+                        <button class="edit-btn" onclick="openEditModal(${goal.id})">✏️</button>
+                    </div>
+
+                    <div class="goal-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">目标天数</div>
+                            <div class="stat-value">${goal.targetDays}天</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">实际完成</div>
+                            <div class="counter-controls">
+                                <button class="counter-btn" onclick="updateCompletedDays(${goal.id}, -1)">-</button>
+                                <span class="counter-value">${goal.completedDays}</span>
+                                <button class="counter-btn" onclick="updateCompletedDays(${goal.id}, 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">剩余天数</div>
+                            <div class="stat-value remaining">${remainingDays}天</div>
+                        </div>
+                    </div>
+
+                    <div class="last-update">上次更新：${lastUpdate}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 更新完成天数
+        async function updateCompletedDays(goalId, delta) {
+            const goal = appData.goals.find(g => g.id === goalId);
+            if (!goal) return;
+
+            const newValue = goal.completedDays + delta;
+            if (newValue < 0) return;
+            if (newValue > goal.targetDays) {
+                if (!confirm('完成天数不能超过目标天数，是否继续？')) return;
+            }
+
+            goal.completedDays = newValue;
+            goal.lastUpdate = new Date().toISOString();
+
+            // 保存到本地
+            saveLocalData();
+
+            // 同步到服务器
+            await syncGoal(goal);
+
+            renderGoals();
+        }
+
+        // 打开编辑模态框
+        let editingGoalId = null;
+        function openEditModal(goalId) {
+            const goal = appData.goals.find(g => g.id === goalId);
+            if (!goal) return;
+
+            editingGoalId = goalId;
+            document.getElementById('editName').value = goal.name;
+            document.getElementById('editTargetDays').value = goal.targetDays;
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('active');
+            editingGoalId = null;
+        }
+
+        // 保存编辑
+        async function saveGoal() {
+            const name = document.getElementById('editName').value.trim();
+            const targetDays = parseInt(document.getElementById('editTargetDays').value);
+
+            if (!name) {
+                alert('请输入目标名称');
+                return;
+            }
+
+            if (targetDays < 1) {
+                alert('目标天数必须大于0');
+                return;
+            }
+
+            const goal = appData.goals.find(g => g.id === editingGoalId);
+            if (goal) {
+                goal.name = name;
+                goal.targetDays = targetDays;
+                if (goal.completedDays > targetDays) {
+                    goal.completedDays = targetDays;
+                }
+                goal.lastUpdate = new Date().toISOString();
+
+                saveLocalData();
+                await syncGoal(goal);
+                renderGoals();
+                closeModal();
+            }
+        }
+
+        // 删除目标
+        async function deleteGoal() {
+            if (!confirm('确定要删除这个目标吗？')) return;
+
+            const goalIndex = appData.goals.findIndex(g => g.id === editingGoalId);
+            if (goalIndex !== -1) {
+                const goalId = appData.goals[goalIndex].id;
+                appData.goals.splice(goalIndex, 1);
+
+                saveLocalData();
+                await deleteGoalOnServer(goalId);
+                renderGoals();
+                closeModal();
+            }
+        }
+
+        // 添加新目标
+        async function addNewGoal() {
+            const newGoal = {
+                id: Date.now(),
+                name: '新目标',
+                targetDays: 30,
+                completedDays: 0,
+                lastUpdate: new Date().toISOString()
+            };
+
+            appData.goals.push(newGoal);
+            saveLocalData();
+
+            // 同步到服务器
+            const serverGoal = await createGoalOnServer(newGoal);
+            if (serverGoal) {
+                // 更新本地目标ID（如果服务器返回了新的ID）
+                newGoal.id = serverGoal.id;
+            }
+
+            renderGoals();
+        }
+
+        // 保存本地数据（作为备份）
+        function saveLocalData() {
+            localStorage.setItem('aimtracker_backup', JSON.stringify(appData.goals));
+        }
+
+        // 格式化日期
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+            const weekDay = weekDays[date.getDay()];
+            return `${year}年${month}月${day}日 星期${weekDay}`;
+        }
+
+        // 格式化日期时间
+        function formatDateTime(isoString) {
+            const date = new Date(isoString);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+
+            const period = hours >= 12 ? '下午' : '上午';
+            const displayHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
+
+            return `${year}年${month}月${day}日 ${period}${displayHours}:${minutes.toString().padStart(2, '0')}`;
+        }
+
+        // 初始化应用
+        init();
+    </script>
+</body>
+</html>
