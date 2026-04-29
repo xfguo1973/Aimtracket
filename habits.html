@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日常习惯追踪器 - AimTracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .date-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .date-bar .date {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .date-bar .weekday {
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* 时间段卡片 */
+        .time-section {
+            margin-bottom: 24px;
+        }
+
+        .time-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .time-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .time-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .time-morning {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa07a 100%);
+        }
+
+        .time-forenoon {
+            background: linear-gradient(135deg, #ffd93d 0%, #ff9500 100%);
+        }
+
+        .time-afternoon {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+        }
+
+        .time-evening {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .time-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .add-habit-btn {
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-habit-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .habit-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s;
+        }
+
+        .habit-card:hover {
+            transform: translateX(5px);
+        }
+
+        .habit-card.completed {
+            background: #f0fff4;
+        }
+
+        .habit-card.completed .habit-name {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .habit-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .habit-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .habit-text {
+            flex: 1;
+        }
+
+        .habit-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .habit-description {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .habit-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .habit-check {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .habit-check:hover {
+            border-color: #4ecdc4;
+        }
+
+        .habit-check.completed {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            border-color: #4ecdc4;
+        }
+
+        .habit-check i {
+            color: white;
+            font-size: 18px;
+            display: none;
+        }
+
+        .habit-check.completed i {
+            display: block;
+        }
+
+        .habit-delete {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: #ffebee;
+            color: #e53935;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0;
+        }
+
+        .habit-card:hover .habit-delete {
+            opacity: 1;
+        }
+
+        .habit-delete:hover {
+            background: #e53935;
+            color: white;
+        }
+
+        /* 统计面板 */
+        .stats-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .stats-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: #f7f9fc;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #38ef7d;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-top: 16px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        /* 操作按钮 */
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #11998e;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* 日历选择器 */
+        .calendar-modal, .add-habit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .calendar-modal.show, .add-habit-modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #11998e;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #11998e;
+        }
+
+        .emoji-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .emoji-option {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f7f9fc;
+            border-radius: 8px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .emoji-option:hover {
+            background: #e8f5e9;
+            transform: scale(1.1);
+        }
+
+        .emoji-option.selected {
+            background: #c8e6c9;
+            border: 2px solid #4caf50;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.cancel {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .modal-btn.confirm {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .calendar-day:hover {
+            background: #f0f0f0;
+        }
+
+        .calendar-day.today {
+            background: #11998e;
+            color: white;
+        }
+
+        .calendar-day.selected {
+            background: #38ef7d;
+            color: white;
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+
+        .calendar-day.has-data {
+            position: relative;
+        }
+
+        .calendar-day.has-data::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 4px;
+            height: 4px;
+            background: #38ef7d;
+            border-radius: 50%;
+        }
+
+        /* 历史记录 */
+        .history-section {
+            margin-top: 20px;
+        }
+
+        .history-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .history-list {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .history-item {
+            flex-shrink: 0;
+            background: white;
+            border-radius: 10px;
+            padding: 12px 16px;
+            text-align: center;
+            min-width: 80px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .history-date {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .history-count {
+            font-size: 20px;
+            font-weight: bold;
+            color: #38ef7d;
+            margin-top: 4px;
+        }
+
+        .history-percent {
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .habit-card {
+                padding: 12px;
+            }
+
+            .habit-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+
+            .habit-name {
+                font-size: 14px;
+            }
+
+            .habit-delete {
+                opacity: 1;
+            }
+
+            .stats-grid {
+                gap: 10px;
+            }
+
+            .stat-value {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>🌅 日常习惯追踪器</h1>
+            <p>培养好习惯，成就更好的自己</p>
+        </div>
+
+        <!-- 日期栏 -->
+        <div class="date-bar">
+            <div class="date" id="currentDate">2026年4月29日</div>
+            <div class="weekday" id="currentWeekday">星期二</div>
+        </div>
+
+        <!-- 清晨 -->
+        <div class="time-section">
+            <div class="time-header">
+                <div class="time-header-left">
+                    <div class="time-icon time-morning">🌅</div>
+                    <span class="time-title">清晨</span>
+                </div>
+                <button class="add-habit-btn" onclick="showAddHabitModal('morning')">+ 添加</button>
+            </div>
+            <div class="habits-list" id="morningHabits">
+            </div>
+        </div>
+
+        <!-- 上午 -->
+        <div class="time-section">
+            <div class="time-header">
+                <div class="time-header-left">
+                    <div class="time-icon time-forenoon">☀️</div>
+                    <span class="time-title">上午</span>
+                </div>
+                <button class="add-habit-btn" onclick="showAddHabitModal('forenoon')">+ 添加</button>
+            </div>
+            <div class="habits-list" id="forenoonHabits">
+            </div>
+        </div>
+
+        <!-- 下午 -->
+        <div class="time-section">
+            <div class="time-header">
+                <div class="time-header-left">
+                    <div class="time-icon time-afternoon">🌤️</div>
+                    <span class="time-title">下午</span>
+                </div>
+                <button class="add-habit-btn" onclick="showAddHabitModal('afternoon')">+ 添加</button>
+            </div>
+            <div class="habits-list" id="afternoonHabits">
+            </div>
+        </div>
+
+        <!-- 晚上 -->
+        <div class="time-section">
+            <div class="time-header">
+                <div class="time-header-left">
+                    <div class="time-icon time-evening">🌙</div>
+                    <span class="time-title">晚上</span>
+                </div>
+                <button class="add-habit-btn" onclick="showAddHabitModal('evening')">+ 添加</button>
+            </div>
+            <div class="habits-list" id="eveningHabits">
+            </div>
+        </div>
+
+        <!-- 统计面板 -->
+        <div class="stats-panel">
+            <div class="stats-title">📊 今日进度</div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="completedCount">0</div>
+                    <div class="stat-label">已完成</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalCount">0</div>
+                    <div class="stat-label">总习惯</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="completionPercent">0%</div>
+                    <div class="stat-label">完成率</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="action-bar">
+            <button class="btn btn-primary" onclick="showCalendar()">📅 查看历史</button>
+            <button class="btn btn-secondary" onclick="resetToday()">🔄 重置今日</button>
+        </div>
+
+        <!-- 历史记录 -->
+        <div class="history-section">
+            <div class="history-title">📈 最近7天</div>
+            <div class="history-list" id="historyList"></div>
+        </div>
+
+        <!-- 日历模态框 -->
+        <div class="calendar-modal" id="calendarModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title" id="calendarTitle">2026年4月</span>
+                    <button class="modal-close" onclick="hideCalendar()">✕</button>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+        </div>
+
+        <!-- 添加习惯模态框 -->
+        <div class="add-habit-modal" id="addHabitModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title">添加新习惯</span>
+                    <button class="modal-close" onclick="hideAddHabitModal()">✕</button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">习惯名称</label>
+                    <input type="text" class="form-input" id="habitNameInput" placeholder="例如：阅读30分钟">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">描述（可选）</label>
+                    <input type="text" class="form-input" id="habitDescInput" placeholder="例如：每天阅读30页">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">选择图标</label>
+                    <div class="emoji-picker" id="emojiPicker">
+                        <button class="emoji-option" onclick="selectEmoji('📚')">📚</button>
+                        <button class="emoji-option" onclick="selectEmoji('🏃')">🏃</button>
+                        <button class="emoji-option" onclick="selectEmoji('💧')">💧</button>
+                        <button class="emoji-option" onclick="selectEmoji('🍎')">🍎</button>
+                        <button class="emoji-option" onclick="selectEmoji('💤')">💤</button>
+                        <button class="emoji-option" onclick="selectEmoji('🧘')">🧘</button>
+                        <button class="emoji-option" onclick="selectEmoji('🎯')">🎯</button>
+                        <button class="emoji-option" onclick="selectEmoji('📝')">📝</button>
+                        <button class="emoji-option" onclick="selectEmoji('🎨')">🎨</button>
+                        <button class="emoji-option" onclick="selectEmoji('🎵')">🎵</button>
+                        <button class="emoji-option" onclick="selectEmoji('💪')">💪</button>
+                        <button class="emoji-option" onclick="selectEmoji('🌱')">🌱</button>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn cancel" onclick="hideAddHabitModal()">取消</button>
+                    <button class="modal-btn confirm" onclick="addNewHabit()">确认添加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DEFAULT_HABITS = {
+            morning: [
+                { id: 'wake-up', name: '立即起床', desc: '闹钟一响，立刻起床，不要赖床', emoji: '⏰', color: '#ff6b6b' },
+                { id: 'drink-water', name: '喝一杯水', desc: '起床后立刻喝一杯水，补充睡眠时流失的水分', emoji: '💧', color: '#4ecdc4' },
+                { id: 'make-bed', name: '整理床铺', desc: '完成它能给你带来成就感，为一天奠定积极的基调', emoji: '🛏️', color: '#ffeaa7' },
+                { id: 'exercise', name: '运动', desc: '进行任何形式的运动，哪怕是10分钟的拉伸', emoji: '🏃', color: '#fd79a8' }
+            ],
+            forenoon: [
+                { id: 'healthy-breakfast', name: '健康早餐', desc: '为大脑和身体提供优质燃料', emoji: '🍳', color: '#ffeaa7' },
+                { id: 'important-task', name: '处理重要任务', desc: '攻克当天最重要、最困难的任务', emoji: '🎯', color: '#a29bfe' },
+                { id: 'deep-work', name: '深度工作', desc: '在一段不被打扰的时间内，专注于一项任务', emoji: '🧠', color: '#fd79a8' }
+            ],
+            afternoon: [
+                { id: 'lunch', name: '午餐', desc: '吃一顿健康的午餐', emoji: '🥗', color: '#fdcb6e' },
+                { id: 'social-learn', name: '社交或学习', desc: '安排社交活动或学习新技能', emoji: '📚', color: '#74b9ff' },
+                { id: 'secondary-tasks', name: '处理次要任务', desc: '处理不那么重要或费脑的任务', emoji: '📧', color: '#a29bfe' }
+            ],
+            evening: [
+                { id: 'dinner', name: '晚餐', desc: '吃一顿相对清淡的晚餐', emoji: '🍽️', color: '#fdcb6e' },
+                { id: 'relax', name: '放松', desc: '做一些让你放松的事情', emoji: '🎬', color: '#74b9ff' },
+                { id: 'prepare-tomorrow', name: '为明天做准备', desc: '规划明天的日程和任务', emoji: '📝', color: '#a29bfe' },
+                { id: 'journal', name: '写日记/反思', desc: '回顾今天，写下三件感激的事情', emoji: '📔', color: '#fd79a8' },
+                { id: 'sleep', name: '按时睡觉', desc: '保证充足的睡眠', emoji: '😴', color: '#667eea' }
+            ]
+        };
+
+        const COLORS = ['#ff6b6b', '#ffa07a', '#ffeaa7', '#fdcb6e', '#4ecdc4', '#44a08d', '#74b9ff', '#0984e3', '#a29bfe', '#6c5ce7', '#fd79a8', '#e84393'];
+        
+        let currentDate = new Date();
+        let currentTimeSlot = '';
+        let selectedEmoji = '📚';
+        let habits = {};
+
+        function init() {
+            loadHabitsConfig();
+            updateDateDisplay();
+            renderHabits();
+            loadCompletedHabits();
+            updateStats();
+            loadHistory();
+        }
+
+        function loadHabitsConfig() {
+            const saved = localStorage.getItem('habits_config');
+            if (saved) {
+                habits = JSON.parse(saved);
+            } else {
+                habits = JSON.parse(JSON.stringify(DEFAULT_HABITS));
+                saveHabitsConfig();
+            }
+        }
+
+        function saveHabitsConfig() {
+            localStorage.setItem('habits_config', JSON.stringify(habits));
+        }
+
+        function updateDateDisplay() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth() + 1;
+            const day = currentDate.getDate();
+            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            const weekday = weekdays[currentDate.getDay()];
+            
+            document.getElementById('currentDate').textContent = `${year}年${month}月${day}日`;
+            document.getElementById('currentWeekday').textContent = weekday;
+        }
+
+        function getStorageKey(date = currentDate) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `habits_${year}${month}${day}`;
+        }
+
+        function renderHabits() {
+            const timeSlots = ['morning', 'forenoon', 'afternoon', 'evening'];
+            
+            timeSlots.forEach(slot => {
+                const container = document.getElementById(`${slot}Habits`);
+                container.innerHTML = '';
+                
+                habits[slot].forEach(habit => {
+                    const card = document.createElement('div');
+                    card.className = 'habit-card';
+                    card.dataset.habit = habit.id;
+                    card.innerHTML = `
+                        <div class="habit-info">
+                            <div class="habit-icon" style="background: linear-gradient(135deg, ${habit.color} 0%, ${adjustColor(habit.color, -30)} 100%);">${habit.emoji}</div>
+                            <div class="habit-text">
+                                <div class="habit-name">${habit.name}</div>
+                                <div class="habit-description">${habit.desc}</div>
+                            </div>
+                        </div>
+                        <div class="habit-actions">
+                            <button class="habit-delete" onclick="deleteHabit('${slot}', '${habit.id}')">🗑️</button>
+                            <div class="habit-check" onclick="toggleHabit('${habit.id}')">
+                                <i>✓</i>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        function adjustColor(hex, amount) {
+            const num = parseInt(hex.replace('#', ''), 16);
+            const r = Math.min(255, Math.max(0, (num >> 16) + amount));
+            const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amount));
+            const b = Math.min(255, Math.max(0, (num & 0x0000FF) + amount));
+            return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+        }
+
+        function loadCompletedHabits() {
+            const key = getStorageKey();
+            const data = localStorage.getItem(key);
+            const completed = data ? JSON.parse(data) : [];
+            
+            Object.keys(habits).forEach(slot => {
+                habits[slot].forEach(habit => {
+                    const card = document.querySelector(`.habit-card[data-habit="${habit.id}"]`);
+                    const check = card ? card.querySelector('.habit-check') : null;
+                    
+                    if (card && check) {
+                        if (completed.includes(habit.id)) {
+                            card.classList.add('completed');
+                            check.classList.add('completed');
+                        } else {
+                            card.classList.remove('completed');
+                            check.classList.remove('completed');
+                        }
+                    }
+                });
+            });
+        }
+
+        function toggleHabit(habitId) {
+            const key = getStorageKey();
+            const data = localStorage.getItem(key);
+            let completed = data ? JSON.parse(data) : [];
+            
+            const index = completed.indexOf(habitId);
+            if (index > -1) {
+                completed.splice(index, 1);
+            } else {
+                completed.push(habitId);
+            }
+            
+            localStorage.setItem(key, JSON.stringify(completed));
+            loadCompletedHabits();
+            updateStats();
+            loadHistory();
+        }
+
+        function deleteHabit(slot, habitId) {
+            if (confirm('确定要删除这个习惯吗？')) {
+                habits[slot] = habits[slot].filter(h => h.id !== habitId);
+                saveHabitsConfig();
+                renderHabits();
+                loadCompletedHabits();
+                updateStats();
+            }
+        }
+
+        function showAddHabitModal(slot) {
+            currentTimeSlot = slot;
+            selectedEmoji = '📚';
+            document.getElementById('habitNameInput').value = '';
+            document.getElementById('habitDescInput').value = '';
+            
+            document.querySelectorAll('.emoji-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            document.getElementById('addHabitModal').classList.add('show');
+        }
+
+        function hideAddHabitModal() {
+            document.getElementById('addHabitModal').classList.remove('show');
+        }
+
+        function selectEmoji(emoji) {
+            selectedEmoji = emoji;
+            document.querySelectorAll('.emoji-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function addNewHabit() {
+            const name = document.getElementById('habitNameInput').value.trim();
+            const desc = document.getElementById('habitDescInput').value.trim();
+            
+            if (!name) {
+                alert('请输入习惯名称');
+                return;
+            }
+            
+            const newHabit = {
+                id: `custom-${Date.now()}`,
+                name: name,
+                desc: desc || '暂无描述',
+                emoji: selectedEmoji,
+                color: COLORS[Math.floor(Math.random() * COLORS.length)]
+            };
+            
+            habits[currentTimeSlot].push(newHabit);
+            saveHabitsConfig();
+            renderHabits();
+            loadCompletedHabits();
+            updateStats();
+            hideAddHabitModal();
+        }
+
+        function updateStats() {
+            const key = getStorageKey();
+            const data = localStorage.getItem(key);
+            const completed = data ? JSON.parse(data) : [];
+            
+            let total = 0;
+            Object.values(habits).forEach(slot => {
+                total += slot.length;
+            });
+            
+            const count = completed.length;
+            const percent = total > 0 ? Math.round((count / total) * 100) : 0;
+            
+            document.getElementById('completedCount').textContent = count;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('completionPercent').textContent = `${percent}%`;
+            document.getElementById('progressFill').style.width = `${percent}%`;
+        }
+
+        function resetToday() {
+            if (confirm('确定要重置今日所有习惯吗？')) {
+                const key = getStorageKey();
+                localStorage.removeItem(key);
+                loadCompletedHabits();
+                updateStats();
+                loadHistory();
+            }
+        }
+
+        function loadHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            
+            let totalCompleted = 0;
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(currentDate);
+                date.setDate(date.getDate() - i);
+                
+                const key = getStorageKey(date);
+                const data = localStorage.getItem(key);
+                const completed = data ? JSON.parse(data) : [];
+                
+                let total = 0;
+                Object.values(habits).forEach(slot => {
+                    total += slot.length;
+                });
+                
+                const percent = total > 0 ? Math.round((completed.length / total) * 100) : 0;
+                
+                if (i === 0) {
+                    totalCompleted = completed.length;
+                }
+                
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <div class="history-date">${date.getMonth() + 1}/${date.getDate()}</div>
+                    <div class="history-count">${completed.length}</div>
+                    <div class="history-percent">${percent}%</div>
+                `;
+                list.appendChild(item);
+            }
+        }
+
+        function showCalendar() {
+            document.getElementById('calendarModal').classList.add('show');
+            renderCalendar();
+        }
+
+        function hideCalendar() {
+            document.getElementById('calendarModal').classList.remove('show');
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('calendarTitle').textContent = `${year}年${month + 1}月`;
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            weekdays.forEach(day => {
+                const cell = document.createElement('div');
+                cell.className = 'calendar-day';
+                cell.textContent = day;
+                cell.style.fontWeight = '600';
+                cell.style.color = '#999';
+                grid.appendChild(cell);
+            });
+            
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const cell = document.createElement('div');
+                cell.className = 'calendar-day other-month';
+                cell.textContent = daysInPrevMonth - i;
+                grid.appendChild(cell);
+            }
+            
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = document.createElement('div');
+                cell.className = 'calendar-day';
+                
+                const date = new Date(year, month, day);
+                const key = getStorageKey(date);
+                const data = localStorage.getItem(key);
+                
+                if (data) {
+                    cell.classList.add('has-data');
+                }
+                
+                if (isCurrentMonth && today.getDate() === day) {
+                    cell.classList.add('today');
+                }
+                
+                cell.textContent = day;
+                grid.appendChild(cell);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

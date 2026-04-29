@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'aimtracker_secret_key_2026';
 
 const USERS_FILE = path.join(__dirname, 'data', 'users.json');
@@ -279,6 +279,14 @@ app.get('/', (req, res) => {
 
 app.get('/index.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/habits', (req, res) => {
+    res.sendFile(path.join(__dirname, 'habits.html'));
+});
+
+app.get('/habits.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'habits.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
