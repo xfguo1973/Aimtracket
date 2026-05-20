@@ -132,12 +132,13 @@
             <span id="loginLinkText">还没有账号？</span>
             <span class="login-link" id="toggleLoginLink" onclick="toggleMode()">立即注册</span>
         </p>
-        <a href="/" class="nav-link">← 返回目标追踪器</a>
+        <a href="index.html" class="nav-link">← 返回目标追踪器</a>
     </div>
 
+    <script src="config.js"></script>
     <script>
         let isLoginMode = true;
-        const API_BASE = window.location.origin;
+        const API_BASE = APP_CONFIG.API_BASE_URL;
 
         function toggleMode() {
             isLoginMode = !isLoginMode;
@@ -173,7 +174,7 @@
             btn.textContent = isLoginMode ? '登录中...' : '注册中...';
             
             try {
-                const endpoint = isLoginMode ? '/api/login' : '/api/register';
+                const endpoint = isLoginMode ? '/login' : '/register';
                 const response = await fetch(API_BASE + endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -186,7 +187,7 @@
                     if (isLoginMode) {
                         localStorage.setItem('habits_token', data.token);
                         localStorage.setItem('habits_username', username);
-                        window.location.href = '/habits';
+                        window.location.href = 'habits.html';
                     } else {
                         isLoginMode = true;
                         toggleMode();
