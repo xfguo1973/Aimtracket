@@ -139,6 +139,25 @@
     <script>
         let isLoginMode = true;
         const API_BASE = APP_CONFIG.API_BASE_URL;
+        const LOCAL_USERS_KEY = 'habits_local_users';
+
+        function getLocalUsers() {
+            try {
+                return JSON.parse(localStorage.getItem(LOCAL_USERS_KEY) || '{}');
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function saveLocalUsers(users) {
+            localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(users));
+        }
+
+        function startLocalSession(username) {
+            localStorage.setItem('habits_token', `local-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+            localStorage.setItem('habits_username', username);
+            window.location.href = 'habits.html';
+        }
 
         function toggleMode() {
             isLoginMode = !isLoginMode;
@@ -174,6 +193,25 @@
             btn.textContent = isLoginMode ? '登录中...' : '注册中...';
             
             try {
+                if (APP_CONFIG.STATIC_AUTH_MODE) {
+                    const users = getLocalUsers();
+                    if (isLoginMode) {
+                        if (!users[username] || users[username].password !== password) {
+                            throw new Error('用户名或密码错误');
+                        }
+                    } else if (users[username]) {
+                        throw new Error('用户名已存在，请直接登录');
+                    } else {
+                        users[username] = {
+                            password,
+                            createdAt: new Date().toISOString()
+                        };
+                        saveLocalUsers(users);
+                    }
+                    startLocalSession(username);
+                    return;
+                }
+
                 const endpoint = isLoginMode ? '/login' : '/register';
                 const response = await fetch(API_BASE + endpoint, {
                     method: 'POST',
