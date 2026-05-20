@@ -1,19 +1,27 @@
-// API 配置
+// API configuration
 const API_BASE_URL = (() => {
-    // 根据当前域名自动判断API地址
+    if (window.AIMTRACKER_API_BASE_URL) {
+        return window.AIMTRACKER_API_BASE_URL;
+    }
+
+    const savedApiBase = window.localStorage && window.localStorage.getItem('AIMTRACKER_API_BASE_URL');
+    if (savedApiBase) {
+        return savedApiBase;
+    }
+
     const hostname = window.location.hostname;
 
-    // 本地开发环境
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
         return 'http://localhost:4000/api';
     }
 
-    // 生产环境：API与前端同源
-    // 如果前后端部署在同一域名下，使用相对路径
+    if (hostname.endsWith('github.io')) {
+        return 'https://aimtracker.up.railway.app/api';
+    }
+
     return '/api';
 })();
 
-// 应用配置
 const APP_CONFIG = {
     API_BASE_URL: API_BASE_URL,
     APP_NAME: 'AimTracker',

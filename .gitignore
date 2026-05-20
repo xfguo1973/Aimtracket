@@ -1,6 +1,7 @@
 # 依赖
 node_modules/
 package-lock.json
+dist/
 
 # 数据文件（生产环境不应上传）
 data/

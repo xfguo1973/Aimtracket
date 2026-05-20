@@ -4,6 +4,7 @@
   "description": "月度目标追踪器后端服务器",
   "main": "server.js",
   "scripts": {
+    "build": "node scripts/build.js",
     "start": "node server.js",
     "dev": "node server.js"
   },
